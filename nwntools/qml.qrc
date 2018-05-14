@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>MainMenuForm.ui.qml</file>
+        <file>MainMenu.qml</file>
+        <file>DDSConverter.qml</file>
+        <file>DDSConverterForm.ui.qml</file>
+    </qresource>
+</RCC>

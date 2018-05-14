@@ -9,7 +9,5 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    nwntools::DDSFile file("input");
-
     return a.exec();
 }

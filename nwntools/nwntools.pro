@@ -1,20 +1,8 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2018-05-11T01:02:22
-#
-#-------------------------------------------------
-
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-TARGET = ddsconvertergui
-TEMPLATE = app
-
-CONFIG += c++17
+QT += quick quickcontrols2
+CONFIG += c++14
 
 # The following define makes your compiler emit warnings if you use
-# any feature of Qt which has been marked as deprecated (the exact warnings
+# any feature of Qt which as been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
@@ -24,17 +12,27 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+SOURCES += main.cpp \
+    ddshandler.cpp
 
-SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-    ddsconverterwidget.cpp
+RESOURCES += qml.qrc
 
-HEADERS += \
-        mainwindow.h \
-    ddsconverterwidget.h
+# Additional import path used to resolve QML modules in Qt Creator's code model
+QML_IMPORT_PATH =
 
-FORMS +=
+# Additional import path used to resolve QML modules just for Qt Quick Designer
+QML_DESIGNER_IMPORT_PATH =
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    MainMenuForm.ui.qml \
+    MainMenu.qml \
+    DDSConverterForm.ui.qml \
+    DDSConverter.qml
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../core/release/ -lcore
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../core/debug/ -lcore
@@ -48,3 +46,6 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../core
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../core/release/core.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../core/debug/core.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../core/libcore.a
+
+HEADERS += \
+    ddshandler.h

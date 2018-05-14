@@ -2,4 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     ddsconvertergui \
-    core
+    core \
+    nwntools

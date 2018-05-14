@@ -3,10 +3,17 @@
 
 #include <QMainWindow>
 #include <QVBoxLayout>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QPlainTextEdit>
+#include <QWidget>
+#include <QButtonGroup>
 #include <QGroupBox>
+#include <QMap>
+#include <QStackedWidget>
+
+enum class AvailableTools : int
+{
+    MAINMENU = 1,
+    DDSCONVERTER
+};
 
 class MainWindow : public QMainWindow
 {
@@ -16,22 +23,21 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void onButtonClicked(int button);
+    void onBackClicked();
+
 private slots:
-    void onInputFolderClicked();
-    void onOutputFolderClicked();
-    void onStartConversion();
 
 private:
+    void connectSlots();
+    void createButtons();
+
     QVBoxLayout *m_mainLayout;
-    QWidget *m_centralWidget;
-    QPushButton *m_inputSelect;
-    QPushButton *m_outputSelect;
-    QPushButton *m_startConversion;
-    QLineEdit *m_inputLine;
-    QLineEdit *m_outputLine;
-    QPlainTextEdit *m_console;
-    QGroupBox *m_inputGroup;
-    QGroupBox *m_outputGroup;
+    QGroupBox *m_menuButtonsGroup;
+    QButtonGroup *m_buttonGroup;
+    QMap<AvailableTools, QWidget*> m_widgetMap;
+    QStackedWidget* m_centralStackedWidget;
 };
 
 #endif // MAINWINDOW_H

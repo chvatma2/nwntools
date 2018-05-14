@@ -1,88 +1,65 @@
 #include "mainwindow.h"
 
-#include <QHBoxLayout>
-#include <QString>
-#include <QFileDialog>
-#include <QDir>
-#include <QDebug>
+#include "ddsconverterwidget.h"
 
-#include "ddsfile.h"
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    m_mainLayout = new QVBoxLayout;
-    m_centralWidget = new QWidget(this);
-
-    m_inputGroup = new QGroupBox("Input Folder");
-    m_outputGroup = new QGroupBox("Output Folder");
-
-    QHBoxLayout *inputLayout = new QHBoxLayout;
-    QHBoxLayout *outputLayout = new QHBoxLayout;
-
-    m_inputLine = new QLineEdit;
-    m_inputSelect = new QPushButton("...");
-    m_outputLine = new QLineEdit;
-    m_outputSelect = new QPushButton("...");
-    m_startConversion = new QPushButton("Start Conversion");
-
-    inputLayout->addWidget(m_inputLine);
-    inputLayout->addWidget(m_inputSelect);
-
-    outputLayout->addWidget(m_outputLine);
-    outputLayout->addWidget(m_outputSelect);
-
-    m_inputGroup->setLayout(inputLayout);
-    m_outputGroup->setLayout(outputLayout);
-
-    m_mainLayout->addWidget(m_inputGroup);
-    m_mainLayout->addWidget(m_outputGroup);
-    m_console = new QPlainTextEdit;
-    m_mainLayout->addWidget(m_startConversion);
-    m_mainLayout->addWidget(m_console);
-
-    m_centralWidget->setLayout(m_mainLayout);
-
-    setCentralWidget(m_centralWidget);
-
-    connect(m_inputSelect, &QPushButton::clicked, this, &MainWindow::onInputFolderClicked);
-    connect(m_outputSelect, &QPushButton::clicked, this, &MainWindow::onOutputFolderClicked);
-    connect(m_startConversion, &QPushButton::clicked, this, &MainWindow::onStartConversion);
+    resize(400, 600);
+    m_centralStackedWidget = new QStackedWidget(this);
+    createButtons();
+    m_widgetMap[AvailableTools::MAINMENU] = m_menuButtonsGroup;
+    m_centralStackedWidget->addWidget(m_menuButtonsGroup);
+    setCentralWidget(m_centralStackedWidget);
+    connectSlots();
 }
 
 MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::onInputFolderClicked()
+void MainWindow::onButtonClicked(int button)
 {
-    QString selectedFolder = QFileDialog::getExistingDirectory();
-    m_inputLine->setText(selectedFolder);
-}
-
-void MainWindow::onOutputFolderClicked()
-{
-    QString selectedFolder = QFileDialog::getExistingDirectory();
-    m_outputLine->setText(selectedFolder);
-}
-
-void MainWindow::onStartConversion()
-{
-    try
+    switch(button)
     {
-        QDir dir(m_inputLine->text());
-        dir.setNameFilters(QStringList()<<"*.dds");
-        QStringList fileList = dir.entryList();
-        dir.mkpath(m_outputLine->text());
-        for(QString str : fileList)
+    case static_cast<int>(AvailableTools::DDSCONVERTER):
+        if(!m_widgetMap.contains(AvailableTools::DDSCONVERTER))
         {
-           m_console->insertPlainText("Converting " + dir.path() + "/" + str + "\n");
-           nwntools::DDSFile ddsfile(dir.path() + "/" + str);
-           ddsfile.convert(m_outputLine->text());
+            DDSConverterWidget* ddsconverter = new DDSConverterWidget();
+            m_widgetMap[AvailableTools::DDSCONVERTER] = ddsconverter;
+            m_centralStackedWidget->addWidget(ddsconverter);
+            connect(ddsconverter, &DDSConverterWidget::backClicked, this, &MainWindow::onBackClicked);
         }
+        m_centralStackedWidget->setCurrentWidget(m_widgetMap[AvailableTools::DDSCONVERTER]);
+        break;
+    default:
+        qDebug() << "Unknowns button";
+        break;
     }
-    catch (std::runtime_error &e)
-    {
-        qDebug() << e.what();
-    }
+}
+
+void MainWindow::onBackClicked()
+{
+    m_centralStackedWidget->setCurrentWidget(m_widgetMap[AvailableTools::MAINMENU]);
+}
+
+void MainWindow::connectSlots()
+{
+    connect(m_buttonGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &MainWindow::onButtonClicked);
+
+}
+
+void MainWindow::createButtons()
+{
+    m_buttonGroup = new QButtonGroup(this);
+    m_mainLayout = new QVBoxLayout;
+    m_menuButtonsGroup = new QGroupBox("Available Tools", this);
+
+    QPushButton *ddsButton = new QPushButton("DDS Converter");
+    m_buttonGroup->addButton(ddsButton, static_cast<int>(AvailableTools::DDSCONVERTER));
+    m_mainLayout->addWidget(ddsButton);
+    m_mainLayout->addStretch();
+    m_menuButtonsGroup->setLayout(m_mainLayout);
 }
